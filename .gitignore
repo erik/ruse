@@ -1,0 +1,4 @@
+*.o
+*~
+ruse
+!src/ruse
