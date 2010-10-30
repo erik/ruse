@@ -22,9 +22,7 @@ import ruse.bindings;
 
 class RuseObject {
     
-    this() {
-    }
-    
+    //can't use opEquals, need Binding param :(
     override bool opEquals(Object o) {
         auto ro = cast(RuseObject)o;
         // TODO: bindings
@@ -45,6 +43,8 @@ class RuseObject {
 
 }
 
+/* TODO: Some more stuff should probably be derived from Atom instead of RuseObject */
+
 class Atom : RuseObject {
     this(RuseObject value) {
         this.value = value;
@@ -56,4 +56,139 @@ class Atom : RuseObject {
     
     private: 
     RuseObject value;
+}
+
+class List : RuseObject {
+    this(RuseObject[] arr) {
+        this.values = arr;
+    }
+    
+    this() {
+        this.values = [];
+    }
+    
+    RuseObject car() {
+        if(values.length > 0) {
+            return values[0];
+        }
+        else {
+            //TODO: return nil instead
+            return new RuseObject();
+        }
+    }
+    
+    List cdr() {
+        if (values.length) {
+            return new List(values[1..$]);
+        }
+        
+        else {
+            //TODO: return nil instead
+            return new List();
+        }
+    }
+    
+    override string toString() {
+        if(this.values.length) {
+            string str = "(";
+            foreach(RuseObject x; values) {
+                str ~= x.toString() ~ " ";
+            }
+            return str ~ "\b)";
+        }
+        else {
+            return "()";
+        }
+    }
+    
+    override RuseObject eval(Binding bind) {
+        if(values.length) {
+            //TODO: + .call(bind, this.cdr)
+            return this.car().eval(bind);
+        }
+        else {
+            //TODO: return nil instead
+            return new RuseObject();
+        }
+    }
+    
+    private:
+    RuseObject[] values;
+}
+
+class Character : RuseObject {
+    this(char c) {
+        this.value = c;
+    }
+    
+    protected:
+    char value;
+}
+
+class String : RuseObject {
+    this(string value) {
+        this.value = value;
+    }
+    
+    Character car() {
+        if(this.value.sizeof) {
+            return new Character(this.value[0]);
+        }
+        else {
+            // TODO: return nil instead
+            return new Character(' ');
+        }
+    }
+    
+    String cdr() {
+        // TODO: handle empty strings, all that good stuff
+        return new String(this.value[1..$]);
+    }
+    
+    override string toString() {
+        return this.value;
+    }
+    
+    protected:
+    string value;
+}
+
+class Symbol : RuseObject {
+    this(string value) {
+        this.value = value;
+    }
+    
+    override string toString() {
+        return value;
+    }
+    
+    override RuseObject eval(Binding bind) {
+        return bind.get(value);
+    }
+    
+    protected:
+    string value;
+}
+
+class Keyword : RuseObject {
+    this(string value) {
+        this.value = value;
+    }
+    
+    //TODO: equality
+    
+    override string toString() {
+        return ":" ~ value;
+    }
+    
+    protected:
+    string value;
+}
+
+class Lambda : RuseObject {
+    //TODO: Implement lambda class
+}
+
+class Macro : Lambda {
+    //TODO: Implement macro class
 }

@@ -1,5 +1,3 @@
-#Fixme: write
-
 DMD=dmd
 DMDFLAGS=-w -debug -gc -unittest
 
