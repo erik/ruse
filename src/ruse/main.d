@@ -20,11 +20,29 @@
 module ruse.main;
 
 import std.stdio;
-import ruse.types;
 
-int main(char[][] args)
+import ruse.types;
+import ruse.reader;
+
+int main(string[] args)
 {
-	
-	return 0;
+    string prompt = ">";
+    
+	Reader r;
+    string src;
+    
+    while(true) {
+        write(prompt ~ " ");
+        src = readln();
+        
+        r = new Reader(src);
+        RuseObject[] exprs = r.read();
+        
+        foreach(RuseObject exp; exprs) {
+            writeln(exp.toString());
+        }
+    }        
+    
+    return 0;
 }
 

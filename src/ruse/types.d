@@ -185,6 +185,24 @@ class Keyword : RuseObject {
     string value;
 }
 
+class Numeric : RuseObject {
+    this(double value) {
+        this.value = value;
+    }
+    
+    RuseObject eval() {
+        return this;
+    }
+    
+    override string toString() {
+        //TODO: text probably isn't the accepted way of doing this
+        return std.conv.text(value);
+    }
+    
+    private:
+    double value;
+}
+
 class Lambda : RuseObject {
     //TODO: Implement lambda class
 }

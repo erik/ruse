@@ -1,6 +1,5 @@
 DMD=dmd
-DMDFLAGS=-w -debug -gc -unittest
-
+DMDFLAGS=-w -debug -gc -unittest 
 LNFLAGS=
 INCS=-Isrc/
 
@@ -16,6 +15,7 @@ all: $(OBJ)
 
 src/ruse/bindings.o: src/ruse/bindings.d src/ruse/types.o
 src/ruse/main.o: src/ruse/main.d src/ruse/types.o
+src/ruse/reader.o: src/ruse/reader.d
 # Circular dependency to bindings.o
 src/ruse/types.o: src/ruse/types.d
 
