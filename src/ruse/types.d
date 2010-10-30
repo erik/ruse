@@ -146,7 +146,7 @@ class String : RuseObject {
     }
     
     override string toString() {
-        return this.value;
+        return '"' ~ this.value ~ '"';
     }
     
     protected:

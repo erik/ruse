@@ -39,6 +39,9 @@ class Reader {
     }
     
     char next() {
+        if(index + 1 >= this.source.length) {
+            throw new EOFError(text("Unexpected EOF on line ", lineNum));
+        }
         this.index++;
         return this.current();
     }
@@ -52,7 +55,6 @@ class Reader {
         RuseObject[] expr = [];
 
         while (this.index < this.source.length - 1) {
-            writeln("this.current = " ~ this.current());
             // skip over whitespace
             if(iswhite(this.current())) {
                 if(this.current == '\n') {
@@ -73,6 +75,17 @@ class Reader {
                 expr ~= this.readNumber();
             }
             
+            //read string
+            else if(this.current == '"') {
+                expr ~= this.readString();
+            }
+            
+            else {
+                throw new SyntaxError(
+                    text("Syntax error near line ",
+                        this.lineNum, " for token: ", this.current));
+            }
+            
             this.next();
         }
         return expr;
@@ -88,10 +101,19 @@ class Reader {
         
         this.prev;
         
-        // TODO: parse will probably throw an exception or otherwise 
-        //    complain when given bad input
+        // TODO: check for valid numbers manually, parse("1.2abc") => 1.2
         return new Numeric(parse!(double)(num));
-    }    
+    }   
+    
+    String readString() {
+        string str = "";
+        
+        while(this.next != '"') {
+            str ~= this.current;
+        }
+        
+        return new String(str);
+    } 
     
     private:
     
@@ -110,4 +132,28 @@ class Reader {
     string source;
     int index;
     char[] delims = ['(', ')'];
+}
+
+class RuseError {
+    public string message;
+    
+    this(string s) {
+        message = s;
+    }
+    
+    this() {
+        message = "an error occured!";
+    }
+}
+
+class SyntaxError : RuseError {
+    this(string s) {
+        message = s;
+    }
+}
+
+class EOFError : RuseError {
+    this(string s) {
+        message = s;
+    }
 }

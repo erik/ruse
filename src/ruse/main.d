@@ -36,10 +36,15 @@ int main(string[] args)
         src = readln();
         
         r = new Reader(src);
-        RuseObject[] exprs = r.read();
-        
-        foreach(RuseObject exp; exprs) {
-            writeln(exp.toString());
+        try {
+            RuseObject[] exprs = r.read();
+            
+            foreach(RuseObject exp; exprs) {
+                writeln(exp.toString());
+            }
+        //TODO: handle eof errors by appending to the string
+        } catch (RuseError e) {
+            writeln(e, ": " ~ e.message);
         }
     }        
     
