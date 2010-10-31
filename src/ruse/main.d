@@ -23,13 +23,16 @@ import std.stdio;
 
 import ruse.types;
 import ruse.reader;
+import ruse.bindings;
+import ruse.globals;
+import ruse.error;
 
 int main(string[] args)
 {
-    string prompt = ">";
-    
-	Reader r;
+    const string prompt = ">";
+    Reader r;
     string src;
+    Binding bind = loadGlobalBindings();
     
     while(true) {
         write(prompt ~ " ");
@@ -40,7 +43,8 @@ int main(string[] args)
             RuseObject[] exprs = r.read();
             
             foreach(RuseObject exp; exprs) {
-                writeln(exp.toString());
+                RuseObject val = exp.eval(bind);
+                writeln(val.toString());
             }
         //TODO: handle eof errors by appending to the string
         } catch (RuseError e) {

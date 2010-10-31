@@ -19,6 +19,8 @@
 
 module ruse.types;
 import ruse.bindings;
+import std.conv;
+import std.string;
 
 class RuseObject {
     
@@ -67,6 +69,13 @@ class List : RuseObject {
         this.values = [];
     }
     
+    RuseObject eval(Binding bind) {
+        Lambda fn = cast(Lambda)(this.car().eval(bind));
+        RuseObject[] args = this.values.length ? this.values[1..$] :
+            [];
+        return fn.call(bind, this.values[1..$]);
+    }
+    
     RuseObject car() {
         if(values.length > 0) {
             return values[0];
@@ -100,18 +109,7 @@ class List : RuseObject {
             return "()";
         }
     }
-    
-    override RuseObject eval(Binding bind) {
-        if(values.length) {
-            //TODO: + .call(bind, this.cdr)
-            return this.car().eval(bind);
-        }
-        else {
-            //TODO: return nil instead
-            return new RuseObject();
-        }
-    }
-    
+        
     private:
     RuseObject[] values;
 }
@@ -218,14 +216,68 @@ class Numeric : RuseObject {
         return std.conv.text(value);
     }
     
-    private:
     double value;
 }
 
+// returns RuseObject, takes (Binding bindings, RuseObject[] args)
+alias RuseObject function(Binding, RuseObject[]) CoreFunction;
+
 class Lambda : RuseObject {
+    this(List args, List bod) {
+        this.core = false;
+        this.args = args;
+        this.bod = bod;
+        this.corefunc = null;
+    }
+    
+    // built in function
+    this(CoreFunction func) {
+        this.core = true;
+        this.args = null;
+        this.bod = null;
+        this.corefunc = func;
+    }
+    
+    override string toString() {
+        if(!core) {
+            return "(fn " ~ this.args.toString()
+                ~ " " ~ this.bod.toString() ~ ")";
+        }
+        
+        return text("#<core fn ", corefunc, ">"); 
+    }
+    
+    Lambda eval(Binding b) {
+        return this;
+    }
+    
+    RuseObject call(Binding bind, RuseObject[] args) {
+        return this.core ? callCore(bind, args) : callRuse(bind, args);
+    }
+    
+    protected:
+    
+    RuseObject callCore(Binding bind, RuseObject[] args) {
+        return this.corefunc(bind, args);
+    }
+    
+    RuseObject callRuse(Binding bind, RuseObject[] args) {
+        Binding local = new Binding(bind);    
+        
+        // TODO: fill this in
+        return new RuseObject();
+    }
+    
+    // core (D) function?
+    bool core;
+    List args;
+    List bod;
+    CoreFunction corefunc;
     //TODO: Implement lambda class
 }
 
+/* TODO: write Lambda class
 class Macro : Lambda {
     //TODO: Implement macro class
-}
+
+}*/

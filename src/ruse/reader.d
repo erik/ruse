@@ -18,7 +18,9 @@
 //      MA 02110-1301, USA.
 
 module ruse.reader;
+
 import ruse.types;
+import ruse.error;
 
 import std.conv;
 import std.string;
@@ -138,6 +140,12 @@ class Reader {
     Keyword readKeyword(){
         string str = "";
         
+        if(isDelim(this.next())) {
+            throw new SyntaxError(text("line ", this.lineNum,
+                ": Keyword can't be empty"));
+        }
+        this.prev();
+        
         while(!isDelim(this.next)) {
             str ~= this.current();
         }
@@ -243,26 +251,3 @@ class Reader {
     char[] delims = ['(', ')'];
 }
 
-class RuseError {
-    public string message;
-    
-    this(string s) {
-        message = s;
-    }
-    
-    this() {
-        message = "an error occured!";
-    }
-}
-
-class SyntaxError : RuseError {
-    this(string s) {
-        message = s;
-    }
-}
-
-class EOFError : RuseError {
-    this(string s) {
-        message = s;
-    }
-}

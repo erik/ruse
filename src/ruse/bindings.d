@@ -20,7 +20,10 @@
 module ruse.bindings;
 
 import std.stdio;
+import std.conv;
+
 import ruse.types;
+import ruse.error;
 
 class Binding {
     
@@ -48,6 +51,9 @@ class Binding {
                     return *val;
                 }
             }
+        } else if(val == null && this.parents == null) {
+            throw new UndefinedSymbolError(text("Undefined symbol: ",
+                name));
         }
         return *val;
     }
@@ -56,4 +62,3 @@ class Binding {
      RuseObject[string] bindings;
      Binding[] parents;    
 }
-
