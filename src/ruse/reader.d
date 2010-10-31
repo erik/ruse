@@ -28,7 +28,7 @@ import std.stdio;
 class Reader {
     
     this(string source) {
-        this.source = source;
+        this.source = source ~ "\n";
         this.lineNum = 1;
         this.index = 0;
     }
@@ -75,15 +75,34 @@ class Reader {
                 expr ~= this.readNumber();
             }
             
-            //read string
+            // read string
             else if(this.current == '"') {
                 expr ~= this.readString();
+            }
+            
+            // read keyword
+            else if(this.current == ':') {
+                expr ~= this.readKeyword();
+            }
+            
+            // read symbol
+            else if(inPattern(this.current, "a-zA-Z_")) {
+                expr ~= this.readSymbol();
+            }
+            
+            // read character
+            else if(this.current == '\\') {
+                expr ~= this.readCharacter();
+            }
+            
+            else if(this.current == '(') {
+                expr ~= this.readList();
             }
             
             else {
                 throw new SyntaxError(
                     text("Syntax error near line ",
-                        this.lineNum, " for token: ", this.current));
+                        this.lineNum, " on character `", this.current, "'"));
             }
             
             this.next();
@@ -115,10 +134,100 @@ class Reader {
         return new String(str);
     } 
     
+    // TODO: more strict handling
+    Keyword readKeyword(){
+        string str = "";
+        
+        while(!isDelim(this.next)) {
+            str ~= this.current();
+        }
+        
+        return new Keyword(str);
+    }
+    
+    Symbol readSymbol() {
+        string str = "" ~ this.current();
+        
+        while(!isDelim(this.next())) {
+            str ~= this.current();
+        }        
+        return new Symbol(str);
+    }
+    
+    Character readCharacter() {
+        char c = this.next();
+        if(!isDelim(this.next())) {
+            throw new SyntaxError(text(
+                "line ", lineNum, ": can't have multichar character literal"));
+        }
+        this.prev();
+        
+        return new Character(c);
+    }
+    
+    List readList() {
+        RuseObject[] expr;
+        
+        // TODO: work around this code repetition ಠ_ಠ
+        while(this.next != ')') {
+            // skip over whitespace
+            if(iswhite(this.current())) {
+                if(this.current == '\n') {
+                    this.lineNum++;
+                }
+            }
+            
+            // skip over comments
+            else if(this.current == ';') {
+                // read to end of line
+                while(this.next != '\n') {}
+                this.lineNum++;
+            }
+            
+            // read number
+            // TODO: Negative numbers
+            else if(isNumeric(this.current)) {
+                expr ~= this.readNumber();
+            }
+            
+            // read string
+            else if(this.current == '"') {
+                expr ~= this.readString();
+            }
+            
+            // read keyword
+            else if(this.current == ':') {
+                expr ~= this.readKeyword();
+            }
+            
+            // read symbol
+            else if(inPattern(this.current, "a-zA-Z_")) {
+                expr ~= this.readSymbol();
+            }
+            
+            // read character
+            else if(this.current == '\\') {
+                expr ~= this.readCharacter();
+            }
+            
+            else if(this.current == '(') {
+                expr ~= this.readList();
+            }
+            
+            else {
+                throw new SyntaxError(
+                    text("Syntax error near line ",
+                        this.lineNum, " on character `", this.current, "'"));
+            }
+            
+        }        
+        return new List(expr);
+    }
+    
     private:
     
     bool isDelim(char c) {
-        if(iswhite(c))
+        if(iswhite(c) || c == '\n')
             return true;
         foreach(char delim; delims) {
             if(c == delim) {

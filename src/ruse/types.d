@@ -121,6 +121,25 @@ class Character : RuseObject {
         this.value = c;
     }
     
+    override string toString() {
+        string val;
+        
+        switch(value) {
+            case '\n':
+                val = "newline";
+                break;
+            case '\r':
+                val = "return";
+                break;
+            case '\t':
+                val = "tab";
+                break;
+            default:
+                val = "" ~ value;
+        }
+        return "\\" ~ val;
+    }
+    
     protected:
     char value;
 }

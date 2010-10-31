@@ -25,6 +25,9 @@ src/ruse/types.o: src/ruse/types.d
 
 #####
 
+todo:
+	@grep -rInso "TODO: \([^*]\+\)" src/
+
 clean:
 	rm -f $(EXE) $(OBJ) 
 
@@ -33,4 +36,4 @@ rebuild: clean all
 loc:
 	@find src -type f -name "*.d" | xargs wc -l
 		
-.PHONY=clean loc rebuild
+.PHONY=clean loc rebuild todo
