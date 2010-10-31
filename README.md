@@ -1,13 +1,14 @@
 #ruse
 
 ##About
-FIXME: write
+ruse is an in-progress implementation of Lisp written in D. 
 
 ##Usage
-FIXME: write
+After building with `make`, run `./ruse` to get a repl.
 
 ##Installation
-FIXME: write
+There is no way to 'install' currently, and I don't see why you would
+ want to. To build, you'll need DMD. Just run `make`.
 
 ##License
 This program is free software: you can redistribute it and/or modify

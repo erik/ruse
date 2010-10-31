@@ -14,8 +14,8 @@ all: $(OBJ)
 	@$(DMD) $(OBJ) $(INCS) $(LNFLAGS) $(DMDFLAGS) -of$(EXE)
 
 src/ruse/bindings.o: src/ruse/bindings.d src/ruse/types.o
-src/ruse/main.o: src/ruse/main.d src/ruse/types.o
-src/ruse/reader.o: src/ruse/reader.d
+src/ruse/main.o: src/ruse/main.d src/ruse/types.o src/ruse/reader.o
+src/ruse/reader.o: src/ruse/reader.d src/ruse/types.o
 # Circular dependency to bindings.o
 src/ruse/types.o: src/ruse/types.d
 
