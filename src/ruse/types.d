@@ -19,6 +19,7 @@
 
 module ruse.types;
 import ruse.bindings;
+import ruse.error;
 import std.conv;
 import std.string;
 
@@ -29,6 +30,10 @@ class RuseObject {
         auto ro = cast(RuseObject)o;
         // TODO: bindings
         return ro.value() == this.value();
+    }
+    
+    RuseObject call(Binding bind, RuseObject[] args) {
+        throw new SyntaxError("can't call a non lambda!");
     }
     
     RuseObject eval(Binding bind) {
@@ -42,7 +47,6 @@ class RuseObject {
     string toString() {
         return "TODO: RuseObject#toString()";
     }
-
 }
 
 /* TODO: Some more stuff should probably be derived from Atom instead of RuseObject */
@@ -70,7 +74,8 @@ class List : RuseObject {
     }
     
     RuseObject eval(Binding bind) {
-        Lambda fn = cast(Lambda)(this.car().eval(bind));
+        
+        RuseObject fn = this.car().eval(bind);
         RuseObject[] args = this.values.length ? this.values[1..$] :
             [];
         return fn.call(bind, this.values[1..$]);
@@ -223,6 +228,7 @@ class Numeric : RuseObject {
 alias RuseObject function(Binding, RuseObject[]) CoreFunction;
 
 class Lambda : RuseObject {
+   
     this(List args, List bod) {
         this.core = false;
         this.args = args;
@@ -247,11 +253,11 @@ class Lambda : RuseObject {
         return text("#<core fn ", corefunc, ">"); 
     }
     
-    Lambda eval(Binding b) {
+    override Lambda eval(Binding b) {
         return this;
     }
     
-    RuseObject call(Binding bind, RuseObject[] args) {
+    override RuseObject call(Binding bind, RuseObject[] args) {
         return this.core ? callCore(bind, args) : callRuse(bind, args);
     }
     
@@ -260,6 +266,7 @@ class Lambda : RuseObject {
     RuseObject callCore(Binding bind, RuseObject[] args) {
         return this.corefunc(bind, args);
     }
+
     
     RuseObject callRuse(Binding bind, RuseObject[] args) {
         Binding local = new Binding(bind);    
