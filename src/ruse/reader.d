@@ -127,7 +127,12 @@ class Reader {
         
         while(!isDelim(this.next())) {
             str ~= this.current();
-        }        
+        }      
+        
+        if(isDelim(this.current)) {
+            this.prev;
+        }
+        
         return new Symbol(str);
     }
     

@@ -37,11 +37,20 @@ Binding loadGlobalBindings() {
     binds.set("car", new Lambda(&car));
     binds.set("cdr", new Lambda(&cdr));
     
+    binds.set("quote", new Lambda(&quote));
+    
     return binds;
 }
 
 // core functions
 private:
+
+void checkArgs(string func, int expected, RuseObject[] args) {
+    if(args.length != expected) {
+        throw new ArgumentError("wrong number of arguments to "
+            ~ func ~ " " ~ text(args.length) ~ " ~ for " ~ text(expected));
+    }
+}
 
 RuseObject add(Binding bind, RuseObject[] args) {
     double total = 0;
@@ -54,19 +63,19 @@ RuseObject add(Binding bind, RuseObject[] args) {
 }
 
 RuseObject car(Binding bind, RuseObject args[]) {
-    if(args.length != 1) {
-        throw new ArgumentError("wrong number of arguments to car" ~ 
-            text(args.length) ~ " ~ for 1");
-    }
+    checkArgs("car", 1, args);
     
     return args[0].eval(bind).car();
 }
 
 RuseObject cdr(Binding bind, RuseObject args[]) {
-    if(args.length != 1) {
-        throw new ArgumentError("wrong number of arguments to cdr" ~ 
-            text(args.length) ~ " ~ for 1");
-    }
+    checkArgs("cdr", 1, args);
     
     return args[0].eval(bind).cdr();
+}
+
+RuseObject quote(Binding bind, RuseObject args[]) {
+    checkArgs("quote", 1, args);
+    
+    return args[0];
 }
