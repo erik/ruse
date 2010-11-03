@@ -30,7 +30,7 @@ Binding loadGlobalBindings() {
     binds.set("true", new Symbol("true"));
     binds.set("false", new Symbol("false"));
     
-    binds.set("add", new Lambda(&add));
+    binds.set("+", new Lambda(&add));
     
     return binds;
 }

@@ -227,10 +227,9 @@ class Reader {
                 expr ~= this.readList();
             }
             
+            // everything else is a symbol
             else {
-                throw new SyntaxError(
-                    text("Syntax error near line ",
-                        this.lineNum, " on character `", this.current, "'"));
+                expr ~= this.readSymbol();
             }
             
         }        
@@ -251,17 +250,7 @@ class Reader {
     }
     
     bool isNumeric(char c) {
-        switch(c) {
-            case 'L':
-            case 'U':
-            case 'l':
-            case 'u':
-            case '+':
-            case '-':
-                return false;
-            default:
-                return isNumeric(c);
-        }
+        return inPattern(c, "0-9");
     }
     
     int lineNum;
