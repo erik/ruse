@@ -72,8 +72,8 @@ class Reader {
             }
             
             // read number
-            // TODO: Negative numbers
-            else if(isNumeric(this.current)) {
+            // TODO: negative
+            else if(this.isNumeric(this.current)) {
                 expr ~= this.readNumber();
             }
             
@@ -111,7 +111,17 @@ class Reader {
         string num = "";
         num ~= this.current;
         
+        bool dot = false;
+        
         while(!isDelim(this.next)) {
+            if(this.current == '.') {
+                // only 1 dot allowed
+                if(dot) {
+                    throw new SyntaxError("Malformed number: `" 
+                        ~ num ~ this.current ~ "'");
+                }
+                dot = true;
+            }
             num ~= this.current;
         }
         
@@ -238,6 +248,20 @@ class Reader {
             }
         }
         return false;
+    }
+    
+    bool isNumeric(char c) {
+        switch(c) {
+            case 'L':
+            case 'U':
+            case 'l':
+            case 'u':
+            case '+':
+            case '-':
+                return false;
+            default:
+                return isNumeric(c);
+        }
     }
     
     int lineNum;
