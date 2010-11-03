@@ -33,6 +33,9 @@ Binding loadGlobalBindings() {
     binds.set("false", new Symbol("false"));
     
     binds.set("+", new Lambda(&add));
+    binds.set("-", new Lambda(&sub));
+    binds.set("*", new Lambda(&mul));
+    binds.set("/", new Lambda(&div));
     
     binds.set("car", new Lambda(&car));
     binds.set("cdr", new Lambda(&cdr));
@@ -57,6 +60,53 @@ RuseObject add(Binding bind, RuseObject[] args) {
     foreach(RuseObject arg; args) {
         Numeric val = cast(Numeric)arg.eval(bind);
         total += val.value;
+    }
+    
+    return new Numeric(total);
+}
+
+RuseObject sub(Binding bind, RuseObject[] args) {
+    if(!args.length) {
+        throw new ArgumentError("wrong number of arguments to - 0 for [1+]");
+    }
+    
+    double total = (cast(Numeric)args[0].eval(bind)).value * 
+        args.length == 1 ? -1 : 1;
+        
+    foreach(RuseObject arg; args[1..$]) {
+        Numeric val = cast(Numeric)arg.eval(bind);
+        total -= val.value;
+    }
+    
+    return new Numeric(total);
+}
+
+RuseObject mul(Binding bind, RuseObject[] args) {
+    double total = 1;
+    
+    foreach(RuseObject arg; args) {
+        Numeric val = cast(Numeric)arg.eval(bind);
+        total *= val.value;
+    }
+    
+    return new Numeric(total);
+}
+
+RuseObject div(Binding bind, RuseObject[] args) {
+    if(!args.length) {
+        throw new ArgumentError("wrong number of arguments to / 0 for [1+]");
+    }
+    
+    double total = 1;
+    
+    if(args.length != 1) {
+        total = (cast(Numeric)args[0].eval(bind)).value;
+        args = args[1..$];
+    }
+        
+    foreach(RuseObject arg; args) {
+        Numeric val = cast(Numeric)arg.eval(bind);
+        total /= val.value;
     }
     
     return new Numeric(total);
