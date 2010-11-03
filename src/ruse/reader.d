@@ -115,6 +115,10 @@ class Reader {
             str ~= this.current();
         }
         
+        if(isDelim(this.current)) {
+            this.prev;
+        }
+        
         return new Keyword(str);
     }
     
