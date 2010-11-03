@@ -87,10 +87,6 @@ class Reader {
                 expr ~= this.readKeyword();
             }
             
-            // read symbol
-            else if(inPattern(this.current, "a-zA-Z_")) {
-                expr ~= this.readSymbol();
-            }
             
             // read character
             else if(this.current == '\\') {
@@ -101,10 +97,9 @@ class Reader {
                 expr ~= this.readList();
             }
             
+            // everything else is a symbol
             else {
-                throw new SyntaxError(
-                    text("Syntax error near line ",
-                        this.lineNum, " on character `", this.current, "'"));
+                expr ~= this.readSymbol();
             }
             
             this.next();
