@@ -32,6 +32,14 @@ class RuseObject {
         return ro.value() == this.value();
     }
     
+    RuseObject car() {
+        throw new SyntaxError("can't call 'car' on value " ~ this.toString);
+    }
+
+    RuseObject cdr() {
+        throw new SyntaxError("can't call 'cdr' on value " ~ this.toString);
+    }
+    
     RuseObject call(Binding bind, RuseObject[] args) {
         throw new SyntaxError("can't call a non lambda!");
     }

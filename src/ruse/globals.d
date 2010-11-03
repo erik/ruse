@@ -19,9 +19,11 @@
 
 module ruse.globals;
 import std.stdio;
+import std.conv;
 
 import ruse.types;
 import ruse.bindings;
+import ruse.error;
 
 Binding loadGlobalBindings() {
     Binding binds = new Binding();
@@ -31,6 +33,9 @@ Binding loadGlobalBindings() {
     binds.set("false", new Symbol("false"));
     
     binds.set("+", new Lambda(&add));
+    
+    binds.set("car", new Lambda(&car));
+    binds.set("cdr", new Lambda(&cdr));
     
     return binds;
 }
@@ -46,4 +51,22 @@ RuseObject add(Binding bind, RuseObject[] args) {
     }
     
     return new Numeric(total);
+}
+
+RuseObject car(Binding bind, RuseObject args[]) {
+    if(args.length != 1) {
+        throw new ArgumentError("wrong number of arguments to car" ~ 
+            text(args.length) ~ " ~ for 1");
+    }
+    
+    return args[0].eval(bind).car();
+}
+
+RuseObject cdr(Binding bind, RuseObject args[]) {
+    if(args.length != 1) {
+        throw new ArgumentError("wrong number of arguments to cdr" ~ 
+            text(args.length) ~ " ~ for 1");
+    }
+    
+    return args[0].eval(bind).cdr();
 }

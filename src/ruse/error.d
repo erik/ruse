@@ -50,3 +50,9 @@ class UndefinedSymbolError : RuseError {
         message = s;
     }
 }
+
+class ArgumentError : RuseError {
+    this(string s) {
+        message = s;
+    }
+}
