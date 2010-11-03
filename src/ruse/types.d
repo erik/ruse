@@ -47,6 +47,7 @@ class RuseObject {
     string toString() {
         return "TODO: RuseObject#toString()";
     }
+    
 }
 
 /* TODO: Some more stuff should probably be derived from Atom instead of RuseObject */
@@ -78,7 +79,7 @@ class List : RuseObject {
         RuseObject fn = this.car().eval(bind);
         RuseObject[] args = this.values.length ? this.values[1..$] :
             [];
-        return fn.call(bind, this.values[1..$]);
+        return fn.call(bind, args);
     }
     
     RuseObject car() {

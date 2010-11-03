@@ -57,49 +57,9 @@ class Reader {
         RuseObject[] expr = [];
 
         while (this.index < this.source.length - 1) {
-            // skip over whitespace
-            if(iswhite(this.current())) {
-                if(this.current == '\n') {
-                    this.lineNum++;
-                }
-            }
-            
-            // skip over comments
-            else if(this.current == ';') {
-                // read to end of line
-                while(this.next != '\n') {}
-                this.lineNum++;
-            }
-            
-            // read number
-            // TODO: negative
-            else if(this.isNumeric(this.current)) {
-                expr ~= this.readNumber();
-            }
-            
-            // read string
-            else if(this.current == '"') {
-                expr ~= this.readString();
-            }
-            
-            // read keyword
-            else if(this.current == ':') {
-                expr ~= this.readKeyword();
-            }
-            
-            
-            // read character
-            else if(this.current == '\\') {
-                expr ~= this.readCharacter();
-            }
-            
-            else if(this.current == '(') {
-                expr ~= this.readList();
-            }
-            
-            // everything else is a symbol
-            else {
-                expr ~= this.readSymbol();
+            RuseObject exp = this.readCommon();
+            if(exp !is null ) {
+                expr ~= exp;
             }
             
             this.next();
@@ -110,7 +70,7 @@ class Reader {
     Numeric readNumber() {
         string num = "";
         num ~= this.current;
-        
+
         bool dot = false;
         
         while(!isDelim(this.next)) {
@@ -181,62 +141,57 @@ class Reader {
     List readList() {
         RuseObject[] expr;
         
-        // TODO: work around this code repetition ಠ_ಠ
         while(this.next != ')') {
-            // skip over whitespace
-            if(iswhite(this.current())) {
-                if(this.current == '\n') {
-                    this.lineNum++;
-                }
+            RuseObject exp = this.readCommon();
+            if(exp !is null ) {
+                expr ~= exp;
             }
-            
-            // skip over comments
-            else if(this.current == ';') {
-                // read to end of line
-                while(this.next != '\n') {}
-                this.lineNum++;
-            }
-            
-            // read number
-            // TODO: Negative numbers
-            else if(isNumeric(this.current)) {
-                expr ~= this.readNumber();
-            }
-            
-            // read string
-            else if(this.current == '"') {
-                expr ~= this.readString();
-            }
-            
-            // read keyword
-            else if(this.current == ':') {
-                expr ~= this.readKeyword();
-            }
-            
-            // read symbol
-            else if(inPattern(this.current, "a-zA-Z_")) {
-                expr ~= this.readSymbol();
-            }
-            
-            // read character
-            else if(this.current == '\\') {
-                expr ~= this.readCharacter();
-            }
-            
-            else if(this.current == '(') {
-                expr ~= this.readList();
-            }
-            
-            // everything else is a symbol
-            else {
-                expr ~= this.readSymbol();
-            }
-            
         }        
         return new List(expr);
     }
     
     private:
+    
+    // part of read function that is common to both read and readList
+    RuseObject readCommon() {
+        if(iswhite(this.current())) {
+                if(this.current == '\n') {
+                    this.lineNum++;
+                }
+            }
+            // skip over comments
+            else if(this.current == ';') {
+                // read to end of line
+                while(this.next != '\n') {}
+                this.lineNum++;
+                return null;
+            }
+            // read number
+            // TODO: negative
+            else if(this.isNumeric(this.current)) {
+                return this.readNumber();
+            }
+            // read string
+            else if(this.current == '"') {
+                return this.readString();
+            }
+            // read keyword
+            else if(this.current == ':') {
+                return this.readKeyword();
+            }
+            // read character
+            else if(this.current == '\\') {
+                return this.readCharacter();
+            }
+            else if(this.current == '(') {
+                return this.readList();
+            }
+            
+            else {
+                return this.readSymbol();
+            }
+        return null;
+    }
     
     bool isDelim(char c) {
         if(iswhite(c) || c == '\n')
