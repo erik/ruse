@@ -63,7 +63,7 @@ class RuseObject {
     }
     
     string toString() {
-        return "TODO: RuseObject#toString()";
+        return "<you shouldn't have seen this...>";
     }
     
     @property RuseType type() { return type_; }
@@ -146,8 +146,9 @@ class List : RuseObject {
             return "()";
         }
     }
-        
-    private:
+    
+    @property int length() { return this.values.length; }
+
     RuseObject[] values;
 }
 
@@ -310,8 +311,15 @@ class Lambda : RuseObject {
     RuseObject callRuse(Binding bind, RuseObject[] args) {
         Binding local = new Binding(bind);    
         
-        // TODO: fill this in
-        return new RuseObject();
+        if(args.length != this.args.length) {
+            throw new ArgumentError(text("wrong number of arguments ",
+                args.length, " for ", this.args.length));
+        }
+        
+        for(int i = 0; i < this.args.length; ++i) {
+            local.set(this.args.values[i].toString, args[i].eval(bind));
+        }
+        return this.bod.eval(local);
     }
     
     // core (D) function?

@@ -41,21 +41,21 @@ class Binding {
         this.bindings[name] = value;
     }
     
-    RuseObject get(string name) {
-        // yes! pointers! ಠ_ಠ
-        RuseObject *val = name in this.bindings;
-        if(val == null && this.parents != null) {
+    RuseObject get(string name) {        
+        RuseObject val = this.bindings.get(name, null);
+        if(val !is null) {
+            return val;
+        } else if (this.parents !is null) {
             foreach(Binding parent; parents) {
-                *val = parent.get(name);
-                if(val != null) {
-                    return *val;
+                RuseObject pval = parent.get(name);
+                if(pval !is null) {
+                    return pval;
                 }
             }
-        } else if(val == null && this.parents == null) {
-            throw new UndefinedSymbolError(text("Undefined symbol: ",
-                name));
         }
-        return *val;
+        throw new UndefinedSymbolError(text("Undefined symbol: ",
+            name));
+        return null;
     }
     
     private:

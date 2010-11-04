@@ -42,6 +42,7 @@ Binding loadGlobalBindings() {
     
     binds.set("quote", new Lambda(&quote));
     binds.set("def", new Lambda(&def));
+    binds.set("fn", new Lambda(&fn));
     
     return binds;
 }
@@ -52,7 +53,7 @@ private:
 void checkArgs(string func, int expected, RuseObject[] args) {
     if(args.length != expected) {
         throw new ArgumentError("wrong number of arguments to "
-            ~ func ~ " " ~ text(args.length) ~ " ~ for " ~ text(expected));
+            ~ func ~ " " ~ text(args.length) ~ " for " ~ text(expected));
     }
 }
 
@@ -68,6 +69,11 @@ bool checkCast(RuseObject obj, RuseType toType) {
 Numeric castNumeric(RuseObject obj) {
     checkCast(obj, RuseType.NUMERIC);
     return cast(Numeric)obj;
+}
+
+List castList(RuseObject obj) {
+    checkCast(obj, RuseType.LIST);
+    return cast(List)obj;
 }
 
 RuseObject add(Binding bind, RuseObject[] args) {
@@ -150,4 +156,14 @@ RuseObject def(Binding bind, RuseObject args[]) {
     RuseObject val = args[1].eval(bind);    
     bind.set(args[0].toString(), val);
     return val;
+}
+
+
+RuseObject fn(Binding bind, RuseObject args[]) {
+    checkArgs("fn", 2, args);
+    
+    List bindings = castList(args[0]);
+    List bod = castList(args[1]);
+    
+    return new Lambda(bindings, bod);
 }
