@@ -41,6 +41,7 @@ Binding loadGlobalBindings() {
     binds.set("cdr", new Lambda(&cdr));
     
     binds.set("quote", new Lambda(&quote));
+    binds.set("def", new Lambda(&def));
     
     return binds;
 }
@@ -55,10 +56,24 @@ void checkArgs(string func, int expected, RuseObject[] args) {
     }
 }
 
+bool checkCast(RuseObject obj, RuseType toType) {
+    if(obj.type == toType) {
+        return true;
+    }    
+    throw new IncompatibleTypesError(text("tried to cast ", obj.type, 
+        " to ", toType));
+    return false;
+}
+
+Numeric castNumeric(RuseObject obj) {
+    checkCast(obj, RuseType.NUMERIC);
+    return cast(Numeric)obj;
+}
+
 RuseObject add(Binding bind, RuseObject[] args) {
     double total = 0;
     foreach(RuseObject arg; args) {
-        Numeric val = cast(Numeric)arg.eval(bind);
+        Numeric val = castNumeric(arg);
         total += val.value;
     }
     
@@ -69,12 +84,11 @@ RuseObject sub(Binding bind, RuseObject[] args) {
     if(!args.length) {
         throw new ArgumentError("wrong number of arguments to - 0 for [1+]");
     }
-    
-    double total = (cast(Numeric)args[0].eval(bind)).value * 
+    double total = (castNumeric(args[0].eval(bind))).value * 
         args.length == 1 ? -1 : 1;
         
-    foreach(RuseObject arg; args[1..$]) {
-        Numeric val = cast(Numeric)arg.eval(bind);
+    foreach(RuseObject arg; args[1..$]) {        
+        Numeric val = castNumeric(arg.eval(bind));
         total -= val.value;
     }
     
@@ -85,7 +99,7 @@ RuseObject mul(Binding bind, RuseObject[] args) {
     double total = 1;
     
     foreach(RuseObject arg; args) {
-        Numeric val = cast(Numeric)arg.eval(bind);
+        Numeric val = castNumeric(arg.eval(bind));
         total *= val.value;
     }
     
@@ -100,12 +114,12 @@ RuseObject div(Binding bind, RuseObject[] args) {
     double total = 1;
     
     if(args.length != 1) {
-        total = (cast(Numeric)args[0].eval(bind)).value;
+        total = (castNumeric(args[0].eval(bind))).value;
         args = args[1..$];
     }
         
     foreach(RuseObject arg; args) {
-        Numeric val = cast(Numeric)arg.eval(bind);
+        Numeric val = castNumeric(arg.eval(bind));
         total /= val.value;
     }
     
@@ -128,4 +142,12 @@ RuseObject quote(Binding bind, RuseObject args[]) {
     checkArgs("quote", 1, args);
     
     return args[0];
+}
+
+RuseObject def(Binding bind, RuseObject args[]) {
+    checkArgs("def", 2, args);
+    
+    RuseObject val = args[1].eval(bind);    
+    bind.set(args[0].toString(), val);
+    return val;
 }

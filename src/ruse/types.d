@@ -23,13 +23,23 @@ import ruse.error;
 import std.conv;
 import std.string;
 
+enum RuseType {
+    BLANK,
+    ATOM,
+    LIST,
+    CHARACTER,
+    STRING,
+    SYMBOL,
+    KEYWORD,
+    NUMERIC,
+    LAMBDA,
+    MACRO
+}
+
 class RuseObject {
     
-    //can't use opEquals, need Binding param :(
-    override bool opEquals(Object o) {
-        auto ro = cast(RuseObject)o;
-        // TODO: bindings
-        return ro.value() == this.value();
+    this() {
+        this.type_ = RuseType.BLANK;
     }
     
     RuseObject car() {
@@ -56,6 +66,16 @@ class RuseObject {
         return "TODO: RuseObject#toString()";
     }
     
+    @property RuseType type() { return type_; }
+    @property RuseType type(RuseType t) { return type_ = t; }
+
+    bool isType(RuseType type) {
+        return this.type_ == type;
+    }
+    
+    protected:
+        RuseType type_;
+    
 }
 
 /* TODO: Some more stuff should probably be derived from Atom instead of RuseObject */
@@ -63,6 +83,7 @@ class RuseObject {
 class Atom : RuseObject {
     this(RuseObject value) {
         this.value = value;
+        this.type_ = RuseType.ATOM;
     }
     
     override string toString() {
@@ -76,10 +97,12 @@ class Atom : RuseObject {
 class List : RuseObject {
     this(RuseObject[] arr) {
         this.values = arr;
+        this.type_ = RuseType.LIST;
     }
     
     this() {
         this.values = [];
+        this.type_ = RuseType.LIST;
     }
     
     RuseObject eval(Binding bind) {
@@ -131,6 +154,7 @@ class List : RuseObject {
 class Character : RuseObject {
     this(char c) {
         this.value = c;
+        this.type_ = RuseType.CHARACTER;
     }
     
     override string toString() {
@@ -159,6 +183,7 @@ class Character : RuseObject {
 class String : RuseObject {
     this(string value) {
         this.value = value;
+        this.type_ = RuseType.STRING;
     }
     
     Character car() {
@@ -187,6 +212,7 @@ class String : RuseObject {
 class Symbol : RuseObject {
     this(string value) {
         this.value = value;
+        this.type_ = RuseType.SYMBOL;
     }
     
     override string toString() {
@@ -204,6 +230,7 @@ class Symbol : RuseObject {
 class Keyword : RuseObject {
     this(string value) {
         this.value = value;
+        this.type_ = RuseType.KEYWORD;
     }
     
     //TODO: equality
@@ -219,6 +246,7 @@ class Keyword : RuseObject {
 class Numeric : RuseObject {
     this(double value) {
         this.value = value;
+        this.type_ = RuseType.NUMERIC;
     }
     
     RuseObject eval() {
@@ -243,6 +271,7 @@ class Lambda : RuseObject {
         this.args = args;
         this.bod = bod;
         this.corefunc = null;
+        this.type_ = RuseType.LAMBDA;
     }
     
     // built in function
@@ -251,6 +280,7 @@ class Lambda : RuseObject {
         this.args = null;
         this.bod = null;
         this.corefunc = func;
+        this.type_ = RuseType.LAMBDA;
     }
     
     override string toString() {
@@ -294,6 +324,7 @@ class Lambda : RuseObject {
 
 /* TODO: write Lambda class
 class Macro : Lambda {
-    //TODO: Implement macro class
-
+    this() {
+        this.type_ = RuseType.MACRO;
+    }
 }*/

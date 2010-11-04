@@ -56,3 +56,9 @@ class ArgumentError : RuseError {
         message = s;
     }
 }
+
+class IncompatibleTypesError : RuseError {
+    this(string s) {
+        message = s;
+    }
+}

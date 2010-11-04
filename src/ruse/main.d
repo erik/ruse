@@ -53,9 +53,10 @@ int main(string[] args)
         return 0;
     }
     
+    write(prompt ~ " ");
+    src = readln();
+    
     while(true) {
-        write(prompt ~ " ");
-        src = readln();
         
         r = new Reader(src);
         try {
@@ -65,10 +66,16 @@ int main(string[] args)
                 RuseObject val = exp.eval(bind);
                 writeln(val.toString());
             }
-        //TODO: handle eof errors by appending to the string
-        } catch (RuseError e) {
+        } 
+        catch (EOFError e) {
+            src ~= readln();
+            continue;
+        }           
+        catch (RuseError e) {
             writeln(e, ": " ~ e.message);
         }
+        write(prompt ~ " ");
+        src = readln();
     }        
     
     return 0;
