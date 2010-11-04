@@ -192,6 +192,11 @@ class Reader {
             else if(this.current == '\\') {
                 return this.readCharacter();
             }
+            // quote
+            else if(this.current == '\'') {
+                this.next;
+                return new List([new Symbol("quote"), this.readCommon()]);
+            }
             else if(this.current == '(') {
                 return this.readList();
             }
