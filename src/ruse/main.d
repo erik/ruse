@@ -34,6 +34,25 @@ int main(string[] args)
     string src;
     Binding bind = loadGlobalBindings();
     
+    // TODO: better command line handling
+    if(args.length > 1) {
+        for(int i = 1; i < args.length ; ++i) {
+            switch(args[i]) {
+                case "-e":
+                    args = i == args.length - 1 ? args ~ "" : args;
+                    foreach(RuseObject exp; (new Reader(args[++i])).read()) {
+                        writeln(exp.eval(bind).toString());
+                    }
+                    break;
+                default:
+                writeln("Don't know switch: " ~ args[i]);
+                return 1;
+            }
+        }
+        
+        return 0;
+    }
+    
     while(true) {
         write(prompt ~ " ");
         src = readln();
