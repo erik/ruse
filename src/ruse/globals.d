@@ -73,7 +73,7 @@ Numeric castNumeric(RuseObject obj) {
 RuseObject add(Binding bind, RuseObject[] args) {
     double total = 0;
     foreach(RuseObject arg; args) {
-        Numeric val = castNumeric(arg);
+        Numeric val = castNumeric(arg.eval(bind));
         total += val.value;
     }
     
