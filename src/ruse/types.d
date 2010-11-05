@@ -62,6 +62,21 @@ class RuseObject {
         return this;
     }
     
+    bool boolValue() {
+        if(this.type == RuseType.SYMBOL) {
+            Symbol tmp = cast(Symbol)this;
+            if(tmp.value == "false" || tmp.value == "nil") {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        
+        // everything else is true
+        return true;
+    }
+    
     string toString() {
         return "<you shouldn't have seen this...>";
     }

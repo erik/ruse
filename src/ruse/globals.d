@@ -46,6 +46,8 @@ Binding loadGlobalBindings() {
     binds.set("def", new Lambda(&def));
     binds.set("fn", new Lambda(&fn));
     
+    binds.set("cond", new Lambda(&cond));
+    
     return binds;
 }
 
@@ -182,6 +184,7 @@ RuseObject backquote(Binding bind, RuseObject args[]) {
 
 RuseObject def(Binding bind, RuseObject args[]) {
     checkArgs("def", 2, args);
+    checkCast(args[0], RuseType.SYMBOL);
     
     RuseObject val = args[1].eval(bind);    
     bind.set(args[0].toString(), val);
@@ -196,4 +199,30 @@ RuseObject fn(Binding bind, RuseObject args[]) {
     List bod = castList(args[1]);
     
     return new Lambda(bindings, bod);
+}
+
+RuseObject cond(Binding bind, RuseObject args[]) {
+    if(!args.length) {
+        return new Symbol("nil");
+    }
+    
+    if(args.length % 2) {
+        throw new SyntaxError("malformed cond: predicates and values do not match");
+    }
+
+    RuseObject[] preds;
+    RuseObject[] bods;
+    
+    for(int i = 1; i < args.length; i += 2) {
+        bods  ~= args[i];
+        preds ~= args[i - 1];
+    }
+    
+    for(int i = 0; i < preds.length; ++i) {
+        if(preds[i].eval(bind).boolValue) {
+            return bods[i].eval(bind);
+        }
+    }
+    
+    return new Symbol("nil");
 }
