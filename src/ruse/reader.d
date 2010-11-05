@@ -36,7 +36,9 @@ class Reader {
     }
     
     char current() {
-        // TODO: throw exception if out of bounds
+        if(index >= this.source.length) {
+            throw new EOFError(text("Unexpected EOF on line ", lineNum));
+        }
         return this.source[this.index];
     }
     
@@ -81,13 +83,15 @@ class Reader {
                         ~ num ~ this.current ~ "'");
                 }
                 dot = true;
+            } else if (!this.isNumeric(this.current)) {
+                throw new SyntaxError("Malformed number: `" 
+                    ~ num ~ this.current ~ "'");
             }
             num ~= this.current;
         }
         
         this.prev;
-        
-        // TODO: check for valid numbers manually, parse("1.2abc") => 1.2
+
         return new Numeric(parse!(double)(num));
     }   
     
@@ -100,8 +104,7 @@ class Reader {
         
         return new String(str);
     } 
-    
-    // TODO: more strict handling
+
     Keyword readKeyword(){
         string str = "";
         

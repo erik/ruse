@@ -78,22 +78,6 @@ class RuseObject {
     
 }
 
-/* TODO: Some more stuff should probably be derived from Atom instead of RuseObject */
-
-class Atom : RuseObject {
-    this(RuseObject value) {
-        this.value = value;
-        this.type_ = RuseType.ATOM;
-    }
-    
-    override string toString() {
-        return value.toString();
-    }
-    
-    private: 
-    RuseObject value;
-}
-
 class List : RuseObject {
     this(RuseObject[] arr) {
         this.values = arr;
@@ -118,8 +102,7 @@ class List : RuseObject {
             return values[0];
         }
         else {
-            //TODO: return nil instead
-            return new RuseObject();
+            return new Symbol("nil");
         }
     }
     
@@ -129,8 +112,7 @@ class List : RuseObject {
         }
         
         else {
-            //TODO: return nil instead
-            return new List();
+            return new Symbol("nil");
         }
     }
     
@@ -188,18 +170,21 @@ class String : RuseObject {
     }
     
     Character car() {
-        if(this.value.sizeof) {
+        if(this.value.length) {
             return new Character(this.value[0]);
         }
         else {
-            // TODO: return nil instead
-            return new Character(' ');
+            return new Symbol("nil");
         }
     }
     
     String cdr() {
-        // TODO: handle empty strings, all that good stuff
-        return new String(this.value[1..$]);
+        if(this.value.length > 1) {
+            return new String(this.value[1..$]);
+        }
+        else {
+            return new Symbol("nil");
+        }
     }
     
     override string toString() {
@@ -233,9 +218,7 @@ class Keyword : RuseObject {
         this.value = value;
         this.type_ = RuseType.KEYWORD;
     }
-    
-    //TODO: equality
-    
+
     override string toString() {
         return ":" ~ value;
     }
@@ -255,7 +238,6 @@ class Numeric : RuseObject {
     }
     
     override string toString() {
-        //TODO: text probably isn't the accepted way of doing this
         return std.conv.text(value);
     }
     
@@ -327,10 +309,9 @@ class Lambda : RuseObject {
     List args;
     List bod;
     CoreFunction corefunc;
-    //TODO: Implement lambda class
 }
 
-/* TODO: write Lambda class
+/* TODO: write Macro class
 class Macro : Lambda {
     this() {
         this.type_ = RuseType.MACRO;
