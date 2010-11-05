@@ -41,6 +41,8 @@ Binding loadGlobalBindings() {
     binds.set("cdr", new Lambda(&cdr));
     
     binds.set("quote", new Lambda(&quote));
+    binds.set("backquote", new Lambda(&backquote));
+    
     binds.set("def", new Lambda(&def));
     binds.set("fn", new Lambda(&fn));
     
@@ -148,6 +150,34 @@ RuseObject quote(Binding bind, RuseObject args[]) {
     checkArgs("quote", 1, args);
     
     return args[0];
+}
+
+RuseObject backquote(Binding bind, RuseObject args[]) {
+    checkArgs("backquote", 1, args);
+    if(args[0].type != RuseType.LIST) {
+        return args[0];
+    }
+    List list = castList(args[0]);
+    RuseObject[] expr = [];
+    for(int i = 0; i < list.length; ++i) {
+        
+        RuseObject arg = list.values[i];
+        
+        if(arg.type == RuseType.LIST) {
+            expr ~= backquote(bind, [arg]);
+        }
+        else {
+            if(arg.type == RuseType.SYMBOL && arg.toString == 
+                "unquote") {
+                expr ~= list.values[++i].eval(bind);
+            }
+            
+            else {
+                expr ~= arg;
+            }            
+        }
+    }
+    return expr.length == 1 ? expr[0] : new List(expr);
 }
 
 RuseObject def(Binding bind, RuseObject args[]) {
