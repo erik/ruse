@@ -326,9 +326,38 @@ class Lambda : RuseObject {
     CoreFunction corefunc;
 }
 
-/* TODO: write Macro class
-class Macro : Lambda {
-    this() {
+class Macro : RuseObject {
+    
+    this(List args, List bod) {
+        this.args = args;
+        this.bod = bod;
         this.type_ = RuseType.MACRO;
     }
-}*/
+    
+    override RuseObject call(Binding bind, RuseObject[] args) {
+        Binding local = new Binding(bind);
+        
+        if(args.length != this.args.length) {
+            throw new ArgumentError(text("wrong number of arguments ",
+                args.length, " for ", this.args.length));
+        }
+        
+        for(int i = 0; i < this.args.length; ++i) {
+            local.set(this.args.values[i].toString, args[i].eval(bind));
+        }
+        
+        return this.bod.eval(local).eval(bind);
+    }
+    
+    override Macro eval(Binding b) {
+        return this;
+    }
+
+    override string toString() {
+        return "(macro " ~ this.args.toString()
+            ~ " " ~ this.bod.toString() ~ ")";
+    }
+    
+    List args;
+    List bod;
+}

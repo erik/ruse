@@ -49,6 +49,7 @@ Binding loadGlobalBindings() {
     
     binds.set("def", new Lambda(&def));
     binds.set("fn", new Lambda(&fn));
+    binds.set("macro", new Lambda(&macro_));
     
     binds.set("do", new Lambda(&do_));
     binds.set("cond", new Lambda(&cond));
@@ -230,6 +231,15 @@ RuseObject fn(Binding bind, RuseObject args[]) {
     List bod = castList(args[1]);
     
     return new Lambda(bindings, bod);
+}
+
+RuseObject macro_(Binding bind, RuseObject[] args) {
+    checkArgs("macro", 2, args);
+    
+    List bindings = castList(args[0]);
+    List bod = castList(args[1]);
+    
+    return new Macro(bindings, bod);
 }
 
 RuseObject do_(Binding bind, RuseObject[] args) {
