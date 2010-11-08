@@ -220,6 +220,16 @@ class Reader {
                 this.next;
                 return new List([new Symbol("quote"), this.readCommon()]);
             }
+            // backquote
+            else if(this.current == '`') {
+                this.next;
+                return new List([new Symbol("backquote"), this.readCommon()]);
+            }
+            //unquote
+            else if(this.current == '~') {
+                this.next;
+                return new List([new Symbol("unquote"), this.readCommon()]);
+            }
             else if(this.current == '(') {
                 return this.readList();
             }
