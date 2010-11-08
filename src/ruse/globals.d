@@ -280,10 +280,9 @@ RuseObject cond(Binding bind, RuseObject args[]) {
     return new Symbol("nil");
 }
 
-// TODO: (print "hello\nworld") => "hello\nworld", not hello (newline) world 
 RuseObject print(Binding bind, RuseObject[] args) {
     foreach(RuseObject arg; args) {
-        write(arg.eval(bind).toString);
+        write(arg.eval(bind).printValue);
     }
     return new Symbol("nil");
 }

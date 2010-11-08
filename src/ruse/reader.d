@@ -99,7 +99,27 @@ class Reader {
         string str = "";
         
         while(this.next != '"') {
-            str ~= this.current;
+            // handle escapes
+            if(this.current == '\\') {
+                switch(this.next) {
+                    case 'n':
+                        str ~= '\n';
+                        break;
+                    case 'r':
+                        str ~= '\r';
+                        break;
+                    case 't':
+                        str ~= '\t';
+                        break;
+                    case '"':
+                    str ~= '"';
+                        break;
+                    default:
+                        throw new SyntaxError("Don't know escape: \\" ~ this.current);
+                }
+            } else {
+                str ~= this.current;
+            }
         }
         
         return new String(str);

@@ -81,6 +81,11 @@ class RuseObject {
         return "<you shouldn't have seen this...>";
     }
     
+    // what should appear on (print this)
+    string printValue() {
+        return toString();
+    }
+    
     @property RuseType type() { return type_; }
     @property RuseType type(RuseType t) { return type_ = t; }
 
@@ -174,6 +179,10 @@ class Character : RuseObject {
         return "\\" ~ val;
     }
     
+    override string printValue() {
+        return "" ~ value;
+    }
+    
     protected:
     char value;
 }
@@ -204,6 +213,10 @@ class String : RuseObject {
     
     override string toString() {
         return '"' ~ this.value ~ '"';
+    }
+    
+    override string printValue() {
+        return this.value;
     }
     
     protected:
