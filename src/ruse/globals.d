@@ -36,6 +36,10 @@ Binding loadGlobalBindings() {
     binds.set("-", new Lambda(&sub));
     binds.set("*", new Lambda(&mul));
     binds.set("/", new Lambda(&div));
+    binds.set("%", new Lambda(&mod));
+    
+    binds.set(">", new Lambda(&gt));
+    binds.set("<", new Lambda(&lt));
     
     binds.set("car", new Lambda(&car));
     binds.set("cdr", new Lambda(&cdr));
@@ -46,7 +50,10 @@ Binding loadGlobalBindings() {
     binds.set("def", new Lambda(&def));
     binds.set("fn", new Lambda(&fn));
     
+    binds.set("do", new Lambda(&do_));
     binds.set("cond", new Lambda(&cond));
+    
+    binds.set("print", new Lambda(&print));
     
     return binds;
 }
@@ -136,6 +143,30 @@ RuseObject div(Binding bind, RuseObject[] args) {
     return new Numeric(total);
 }
 
+RuseObject mod(Binding bind, RuseObject[] args) {
+    checkArgs("mod", 2, args);
+    Numeric x = castNumeric(args[0]);
+    Numeric y = castNumeric(args[1]);
+    
+    return new Numeric(x.value % y.value);
+}
+
+RuseObject gt(Binding bind, RuseObject[] args) {
+    checkArgs(">", 2, args);
+    Numeric x = castNumeric(args[0]);
+    Numeric y = castNumeric(args[1]);
+    
+    return new Symbol(x.value > y.value ? "true" : "false");
+}
+
+RuseObject lt(Binding bind, RuseObject[] args) {
+    checkArgs(">", 2, args);
+    Numeric x = castNumeric(args[0]);
+    Numeric y = castNumeric(args[1]);
+    
+    return new Symbol(x.value < y.value ? "true" : "false");
+}
+
 RuseObject car(Binding bind, RuseObject args[]) {
     checkArgs("car", 1, args);
     
@@ -201,6 +232,18 @@ RuseObject fn(Binding bind, RuseObject args[]) {
     return new Lambda(bindings, bod);
 }
 
+RuseObject do_(Binding bind, RuseObject[] args) {
+    if(!args.length) {
+        return new Symbol("nil");
+    } else {
+        foreach (RuseObject arg; args[0..$-1]) {
+            arg.eval(bind);
+        }
+    }
+    
+    return args[$-1].eval(bind);
+}
+
 RuseObject cond(Binding bind, RuseObject args[]) {
     if(!args.length) {
         return new Symbol("nil");
@@ -224,5 +267,13 @@ RuseObject cond(Binding bind, RuseObject args[]) {
         }
     }
     
+    return new Symbol("nil");
+}
+
+// TODO: (print "hello\nworld") => "hello\nworld", not hello (newline) world 
+RuseObject print(Binding bind, RuseObject[] args) {
+    foreach(RuseObject arg; args) {
+        write(arg.eval(bind).toString);
+    }
     return new Symbol("nil");
 }
