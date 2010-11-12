@@ -20,16 +20,19 @@
 module ruse.main;
 
 import std.stdio;
+import std.string;
 
 import ruse.types;
 import ruse.reader;
 import ruse.bindings;
 import ruse.globals;
 import ruse.error;
+import ruse.readline;
 
 int main(string[] args)
 {
-    const string prompt = ">";
+    
+    const string prompt = "> ";
     Reader r;
     string src;
     Binding bind = loadGlobalBindings();
@@ -53,8 +56,7 @@ int main(string[] args)
         return 0;
     }
     
-    write(prompt ~ " ");
-    src = readln();
+    src = readLine(prompt);
     
     while(true) {
         
@@ -68,14 +70,14 @@ int main(string[] args)
             }
         } 
         catch (EOFError e) {
-            src ~= readln();
+            src ~= readLine(prompt);
             continue;
         }           
         catch (RuseError e) {
             writeln(e, ": " ~ e.message);
         }
-        write(prompt ~ " ");
-        src = readln();
+        addHistory(src);
+        src = readLine(prompt);
     }        
     
     return 0;

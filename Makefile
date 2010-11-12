@@ -1,6 +1,6 @@
 DMD=dmd
 DMDFLAGS=-w -debug -gc -unittest 
-LNFLAGS=
+LNFLAGS=-L-lreadline
 INCS=-Isrc/
 
 SRC=$(wildcard src/ruse/*.d)
@@ -15,9 +15,10 @@ all: $(OBJ)
 
 src/ruse/bindings.o: src/ruse/bindings.d src/ruse/types.o
 src/ruse/globals.o: src/ruse/globals.d src/ruse/bindings.o src/ruse/types.o
-src/ruse/main.o: src/ruse/main.d src/ruse/types.o src/ruse/reader.o
+src/ruse/main.o: src/ruse/main.d src/ruse/types.o src/ruse/reader.o \
+src/ruse/readline.d
 src/ruse/reader.o: src/ruse/reader.d src/ruse/types.o
-# Circular dependency to bindings.o
+src/ruse/readline.o: src/ruse/readline.d
 src/ruse/types.o: src/ruse/types.d
 
 .d.o:
